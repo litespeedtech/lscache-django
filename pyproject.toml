@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68,<77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lscache-django"
+version = "0.2.3"
+description = "LiteSpeed Cache integration for Django"
+readme = "README.md"
+requires-python = ">=3.8"
+keywords = ["lscache", "cache", "django"]
+
+authors = [
+  { name = "Cold Egg" }
+]
+
+dependencies = [
+  "Django>=3.2",
+  "requests>=2.25"
+]
+
+classifiers = [
+  "Framework :: Django",
+  "Programming Language :: Python :: 3",
+]
+
+[project.urls]
+Homepage = "https://github.com/litespeedtech/lscache-django"
+Documentation = "https://github.com/litespeedtech/lscache-django/blob/main/README.md"
+Issues = "https://github.com/litespeedtech/lscache-django/issues"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+packages = { find = { where = ["src"] } }
+license-files = ["LICENSE"]
