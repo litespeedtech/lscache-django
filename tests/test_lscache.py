@@ -2,12 +2,13 @@ from django.test import RequestFactory, TestCase
 from django.http import HttpResponse
 from lscache_django.decorators import lscache
 from lscache_django.middleware import LSCacheMiddleware
+from lscache_django import lscache_purge
 import unittest
 
 ####### To run test_lscache.py for app ######
 ### mkdir -p app/tests && touch app/tests/__init__.py 
 ### curl -o app/tests/test_lscache.py https://raw.githubusercontent.com/litespeedtech/lscache-django/main/tests/test_lscache.py
-### python manage.py test app
+### python manage.py test app.tests.test_lscache
 
 class LSCacheMiddlewareTest(TestCase):
 
@@ -82,6 +83,15 @@ class LSCacheMiddlewareTest(TestCase):
         expected = "no-cache"
         print(f"[TEST] test_admin_is_no_cache | Expected: {expected}, Actual: {actual}")
         self.assertEqual(actual, expected)
+
+    def test_purge_all(self):
+        response = HttpResponse("Purging all")
+        response["X-LiteSpeed-Purge"] = "*"
+        actual = response["X-LiteSpeed-Purge"]
+        expected = "*"
+        print(f"[TEST] test_purge_all | Expected: {expected}, Actual: {actual}")
+        self.assertEqual(actual, expected)
+
 
 if __name__ == "__main__":
     loader = unittest.TestLoader()

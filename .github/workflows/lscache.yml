@@ -1,0 +1,45 @@
+name: lscache-django
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+
+      - name: Setup Django environment
+        shell: bash
+        run: |
+          curl -sk -o djangosetup.sh https://raw.githubusercontent.com/litespeedtech/ls-cloud-image/master/Setup/djangosetup.sh
+          sudo bash djangosetup.sh
+          curl -sk -o per-instance.sh https://raw.githubusercontent.com/litespeedtech/ls-cloud-image/master/Cloud-init/per-instance.sh
+          sudo bash per-instance.sh
+          pwd
+          echo 'Active virtual env'
+          source /usr/local/lsws/Example/html/bin/activate
+          cd /usr/local/lsws/Example/html/demo
+          which python
+          echo 'Download lscach-django'
+          sudo git clone https://github.com/litespeedtech/lscache-django.git
+          echo 'Install lscache-django'
+          sudo pip install -e lscache-django
+          sudo pip3 list | grep lscache
+          SETTINGS="demo/settings.py"
+          sudo grep -q "lscache_django" $SETTINGS || sudo sed -i "/INSTALLED_APPS = \[/a\    'lscache_django'," $SETTINGS
+          sudo grep -q "lscache_django.middleware.LSCacheMiddleware" $SETTINGS || sudo sed -i "/MIDDLEWARE = \[/a\    'lscache_django.middleware.LSCacheMiddleware'," $SETTINGS
+          echo 'Setup test'
+          sudo mkdir -p app/tests
+          sudo touch app/tests/__init__.py
+          sudo curl -o app/tests/test_lscache.py https://raw.githubusercontent.com/litespeedtech/lscache-django/main/tests/test_lscache.py
+          echo 'Test'
+          sudo `which python` manage.py test app.tests.test_lscache
